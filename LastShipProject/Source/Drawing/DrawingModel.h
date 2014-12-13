@@ -12,9 +12,7 @@ public:
 	DrawingModel(int handle){ setModel(handle); }
 	void setModel(int handle){ modelHandle_m = handle; }
 	void setModel(BaseModel *model){ modelHandle_m = model->getHandle(); }
-	void draw(){
-		MV1DrawModel(modelHandle_m);
-	}
+	void draw(){ MV1DrawModel(modelHandle_m); }
 	~DrawingModel(){}
 };
 
