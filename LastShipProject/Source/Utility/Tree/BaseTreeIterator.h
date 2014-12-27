@@ -24,15 +24,17 @@ public:
 	bool isFirst() const;
 	bool isLast() const;
 	bool isParent() const;
-	bool goParent();
-	bool goNextSibling();
-	bool goPrevSibling();
-	bool goFirstChild();
-	bool goLastChild();
+	void goParent();
+	void goNextSibling();
+	void goPrevSibling();
+	void goFirstChild();
+	void goLastChild();
 	T& operator*() const;
 	T* operator->() const;
 	bool operator==(const BaseTreeIterator iterator) const;
 	bool operator!=(const BaseTreeIterator iterator) const;
+	operator bool() const;
+	bool operator!() const;
 };
 
 template<typename T>
@@ -60,10 +62,10 @@ inline bool BaseTreeIterator<T>::isRoot() const
 {
 	if (isNull()){ return false; }
 	return myNode_m->parent_m == nullptr &&
-		myNode_m->next_sibling_m != nullptr &&
-		myNode_m->next_sibling_m != myNode_m &&
-		myNode_m->prev_sibling_m != nullptr &&
-		myNode_m->prev_sibling_m != myNode_m;
+		myNode_m->nextSibling_m != nullptr &&
+		myNode_m->nextSibling_m != myNode_m &&
+		myNode_m->prevSibling_m != nullptr &&
+		myNode_m->prevSibling_m != myNode_m;
 }
 
 template<typename T>
@@ -71,8 +73,8 @@ inline bool BaseTreeIterator<T>::isLeaf() const
 {
 	if (isNull()){ return false; }
 	return (isRoot() || myNode_m->parent_m != nullptr) &&
-		myNode_m->first_child_m == nullptr &&
-		myNode_m->last_child_m == nullptr;
+		myNode_m->firstChild_m == nullptr &&
+		myNode_m->lastChild_m == nullptr;
 }
 
 template<typename T>
@@ -81,7 +83,7 @@ inline bool BaseTreeIterator<T>::isFirst() const
 	if (isNull()){ return false; }
 	return isRoot() ||
 		(myNode_m->parent_m != nullptr &&
-		myNode_m->prev_sibling_m == nullptr);
+		myNode_m->prevSibling_m == nullptr);
 }
 
 template<typename T>
@@ -90,55 +92,60 @@ inline bool BaseTreeIterator<T>::isLast() const
 	if (isNull()){ return false; }
 	return isRoot() ||
 		(myNode_m->parent_m != nullptr &&
-		myNode_m->next_sibling_m == nullptr);
+		myNode_m->nextSibling_m == nullptr);
 }
 
 template<typename T>
-inline bool BaseTreeIterator<T>::isParent() const{ return !isLeaf(); }
-
-template<typename T>
-inline bool BaseTreeIterator<T>::goParent()
+inline bool BaseTreeIterator<T>::isParent() const
 {
 	if (isNull()){ return false; }
-	if (myNode_m->parent_m == nullptr){ return false; }
+	return myNode_m->firstChild_m != nullptr &&
+		myNode_m->lastChild_m != nullptr;
+}
+
+template<typename T>
+inline void BaseTreeIterator<T>::goParent()
+{
+	if (isNull()){ return; }
+	if (myNode_m->parent_m == nullptr){ return; }
+
 	myNode_m = myNode_m->parent_m;
-	return true;
 }
 
 template<typename T>
-inline bool BaseTreeIterator<T>::goNextSibling()
+inline void BaseTreeIterator<T>::goNextSibling()
 {
-	if (isNull()){ return false; }
-	if (myNode_m->next_sibling_m == nullptr){ return false; }
-	myNode_m = myNode_m->next_sibling_m;
-	return true;
+	if (isNull()){ return; }
+	if (myNode_m->nextSibling_m == nullptr){ return; }
+
+	myNode_m = myNode_m->nextSibling_m;
 }
 
 template<typename T>
-inline bool BaseTreeIterator<T>::goPrevSibling()
+inline void BaseTreeIterator<T>::goPrevSibling()
 {
-	if (isNull()){ return false; }
-	if (myNode_m->prev_sibling_m == nullptr){ return false; }
-	myNode_m = myNode_m->prev_sibling_m;
-	return true;
+	if (isNull()){ return; }
+	if (myNode_m->prevSibling_m == nullptr){ return; }
+
+	myNode_m = myNode_m->prevSibling_m;
 }
 
 template<typename T>
-inline bool BaseTreeIterator<T>::goFirstChild()
+inline void BaseTreeIterator<T>::goFirstChild()
 {
-	if (isNull()){ return false; }
-	if (myNode_m->first_child_m == nullptr){ return false; }
-	myNode_m = myNode_m->first_child_m;
-	return true;
+	if (isNull()){ return; }
+	if (myNode_m->firstChild_m == nullptr){ return; }
+
+	myNode_m = myNode_m->firstChild_m;
 }
 
 template<typename T>
-inline bool BaseTreeIterator<T>::goLastChild()
+inline void BaseTreeIterator<T>::goLastChild()
 {
-	if (isNull()){ return false; }
-	if (myNode_m->last_child_m == nullptr){ return false; }
-	myNode_m = myNode_m->last_child_m;
-	return true;
+	if (isNull()){ return; }
+	if (myNode_m->lastChild_m == nullptr){ return; }
+
+	myNode_m = myNode_m->lastChild_m;
 }
 
 template<typename T>
@@ -161,3 +168,18 @@ inline bool BaseTreeIterator<T>::operator!=(
 {
 	return !operator==(iterator);
 }
+
+template<typename T>
+inline BaseTreeIterator<T>::operator bool() const
+{
+	return !isNull();
+}
+
+template<typename T>
+inline bool BaseTreeIterator<T>::operator!() const
+{
+	return !operator bool();
+}
+
+
+

@@ -85,11 +85,11 @@ inline Tree<T>& Tree<T>::operator=(const Tree<T>& t)
 template<typename T>
 void Tree<T>::clear()
 {
-	if (head_m->next_sibling_m != tail_m) {
-		TreeNode<T>* current = head_m->next_sibling_m;
+	if (head_m->nextSibling_m != tail_m) {
+		TreeNode<T>* current = head_m->nextSibling_m;
 		TreeNode<T>* next;
 		do {
-			next = current->next_sibling_m;
+			next = current->nextSibling_m;
 			erase(pre_order_iterator(current));
 			current = next;
 		} while (next != tail_m);
@@ -97,7 +97,7 @@ void Tree<T>::clear()
 }
 
 template<typename T>
-inline bool Tree<T>::empty() const { return head_m->next_sibling_m == tail_m; }
+inline bool Tree<T>::empty() const { return head_m->nextSibling_m == tail_m; }
 
 template<typename T>
 inline size_t Tree<T>::size() const { return nodeMap_m.size(); }
@@ -106,9 +106,8 @@ template<typename T>
 size_t Tree<T>::height() const
 {
 	size_t height = 0;
-	pre_order_iterator iterator = begin();
-
-	while (iterator != end()){
+	
+	for (pre_order_iterator iterator = begin(); iterator != end(); ++iterator){
 		if (iterator.isLeaf() && iterator.depth() > height){
 			height = iterator.depth();
 		}
@@ -119,7 +118,7 @@ size_t Tree<T>::height() const
 template<typename T>
 inline typename PreOrderIterator<T> Tree<T>::begin() const
 {
-	return pre_order_iterator(head_m->next_sibling_m);
+	return pre_order_iterator(head_m->nextSibling_m);
 }
 
 template<typename T>
@@ -154,32 +153,31 @@ PreOrderIterator<T> Tree<T>::insert_parent(
 	}
 	else if (child == end()){ return end(); }
 
-	// add node with key as child's parent
 	TreeNode<T>* newNode = new TreeNode<T>(key);
 	nodeMap_m.insert(std::make_pair(key, newNode));
 	newNode->parent_m = child.myNode_m->parent_m;
-	newNode->prev_sibling_m = child.myNode_m->prev_sibling_m;
-	newNode->next_sibling_m = child.myNode_m->next_sibling_m;
-	newNode->first_child_m = child.myNode_m;
-	newNode->last_child_m = child.myNode_m;
-	if (child.myNode_m->next_sibling_m != nullptr) {
-		child.myNode_m->next_sibling_m->prev_sibling_m = newNode;
+	newNode->prevSibling_m = child.myNode_m->prevSibling_m;
+	newNode->nextSibling_m = child.myNode_m->nextSibling_m;
+	newNode->firstChild_m = child.myNode_m;
+	newNode->lastChild_m = child.myNode_m;
+	if (child.myNode_m->nextSibling_m != nullptr) {
+		child.myNode_m->nextSibling_m->prevSibling_m = newNode;
 	}
 	else{
 		if (child.myNode_m->parent_m != nullptr){
-			child.myNode_m->parent_m->last_child_m = newNode;
+			child.myNode_m->parent_m->lastChild_m = newNode;
 		}
 	}
-	if (child.myNode_m->prev_sibling_m != nullptr){
-		child.myNode_m->prev_sibling_m->next_sibling_m = newNode;
+	if (child.myNode_m->prevSibling_m != nullptr){
+		child.myNode_m->prevSibling_m->nextSibling_m = newNode;
 	}
 	else{
 		if (child.myNode_m->parent_m != nullptr){
-			child.myNode_m->parent_m->first_child_m = newNode;
+			child.myNode_m->parent_m->firstChild_m = newNode;
 		}
 	}
-	child.myNode_m->next_sibling_m = nullptr;
-	child.myNode_m->prev_sibling_m = nullptr;
+	child.myNode_m->nextSibling_m = nullptr;
+	child.myNode_m->prevSibling_m = nullptr;
 	child.myNode_m->parent_m = newNode;
 
 	return pre_order_iterator(newNode);
@@ -195,21 +193,20 @@ PreOrderIterator<T> Tree<T>::insert_sibling(
 	}
 	else if (sibling.myNode_m->parent_m == nullptr){ return end(); }
 
-	// add node with key after sibling
 	TreeNode<T>* newNode = new TreeNode<T>(key);
 	nodeMap_m.insert(std::make_pair(key, newNode));
 	newNode->parent_m = sibling.myNode_m->parent_m;
-	newNode->prev_sibling_m = sibling.myNode_m;
-	newNode->next_sibling_m = sibling.myNode_m->next_sibling_m;
-	if (sibling.myNode_m->next_sibling_m != nullptr) {
-		sibling.myNode_m->next_sibling_m->prev_sibling_m = newNode;
+	newNode->prevSibling_m = sibling.myNode_m;
+	newNode->nextSibling_m = sibling.myNode_m->nextSibling_m;
+	if (sibling.myNode_m->nextSibling_m != nullptr) {
+		sibling.myNode_m->nextSibling_m->prevSibling_m = newNode;
 	}
 	else{
 		if (newNode->parent_m != nullptr) {
-			newNode->parent_m->last_child_m = newNode;
+			newNode->parent_m->lastChild_m = newNode;
 		}
 	}
-	sibling.myNode_m->next_sibling_m = newNode;
+	sibling.myNode_m->nextSibling_m = newNode;
 
 	return pre_order_iterator(newNode);
 }
@@ -227,14 +224,14 @@ PreOrderIterator<T> Tree<T>::insert_child(
 	TreeNode<T>* newNode = new TreeNode<T>(key);
 	nodeMap_m.insert(std::make_pair(key, newNode));
 	newNode->parent_m = parent.myNode_m;
-	if (parent.myNode_m->last_child_m != nullptr) {
-		parent.myNode_m->last_child_m->next_sibling_m = newNode;
-		newNode->prev_sibling_m = parent.myNode_m->last_child_m;
+	if (parent.myNode_m->lastChild_m != nullptr) {
+		parent.myNode_m->lastChild_m->nextSibling_m = newNode;
+		newNode->prevSibling_m = parent.myNode_m->lastChild_m;
 	}
 	else {
-		parent.myNode_m->first_child_m = newNode;
+		parent.myNode_m->firstChild_m = newNode;
 	}
-	parent.myNode_m->last_child_m = newNode;
+	parent.myNode_m->lastChild_m = newNode;
 
 	return pre_order_iterator(newNode);
 }
@@ -258,28 +255,28 @@ void Tree<T>::erase(pre_order_iterator pos)
 	if (pos.myNode_m == tail_m) { return; }
 
 	// erase subtree of pos
-	while (pos.myNode_m->first_child_m) {
-		erase(pre_order_iterator(pos.myNode_m->first_child_m));
+	while (pos.myNode_m->firstChild_m) {
+		erase(pre_order_iterator(pos.myNode_m->firstChild_m));
 	}
 
 	TreeNode<T>* deleteNode = pos.myNode_m;
-	if (!deleteNode->prev_sibling_m) {
-		deleteNode->parent_m->first_child_m = deleteNode->next_sibling_m;
+	if (!deleteNode->prevSibling_m) {
+		deleteNode->parent_m->firstChild_m = deleteNode->nextSibling_m;
 	}
 	else {
-		deleteNode->prev_sibling_m->next_sibling_m = deleteNode->next_sibling_m;
+		deleteNode->prevSibling_m->nextSibling_m = deleteNode->nextSibling_m;
 	}
-	if (!deleteNode->next_sibling_m) {
-		deleteNode->parent_m->last_child_m = deleteNode->prev_sibling_m;
+	if (!deleteNode->nextSibling_m) {
+		deleteNode->parent_m->lastChild_m = deleteNode->prevSibling_m;
 	}
 	else {
-		deleteNode->next_sibling_m->prev_sibling_m = deleteNode->prev_sibling_m;
+		deleteNode->nextSibling_m->prevSibling_m = deleteNode->prevSibling_m;
 	}
 	if (deleteNode->parent_m) {
-		if (deleteNode->parent_m->first_child_m == deleteNode &&
-			deleteNode->parent_m->last_child_m == deleteNode) {
-			deleteNode->parent_m->first_child_m = nullptr;
-			deleteNode->parent_m->last_child_m = nullptr;
+		if (deleteNode->parent_m->firstChild_m == deleteNode &&
+			deleteNode->parent_m->lastChild_m == deleteNode) {
+			deleteNode->parent_m->firstChild_m = nullptr;
+			deleteNode->parent_m->lastChild_m = nullptr;
 		}
 	}
 	if (deleteNode->key_m) {
@@ -327,20 +324,20 @@ PreOrderIterator<T> Tree<T>::move(
 
 template<typename T>
 void Tree<T>::disconect(pre_order_iterator &src){
-	if (src.myNode_m->prev_sibling_m) {
-		src.myNode_m->prev_sibling_m->next_sibling_m = src.myNode_m->next_sibling_m;
+	if (src.myNode_m->prevSibling_m) {
+		src.myNode_m->prevSibling_m->nextSibling_m = src.myNode_m->nextSibling_m;
 	}
 	else {
 		if (src.myNode_m->parent_m) {
-			src.myNode_m->parent_m->first_child_m = src.myNode_m->next_sibling_m;
+			src.myNode_m->parent_m->firstChild_m = src.myNode_m->nextSibling_m;
 		}
 	}
-	if (src.myNode_m->next_sibling_m) {
-		src.myNode_m->next_sibling_m->prev_sibling_m = src.myNode_m->prev_sibling_m;
+	if (src.myNode_m->nextSibling_m) {
+		src.myNode_m->nextSibling_m->prevSibling_m = src.myNode_m->prevSibling_m;
 	}
 	else {
 		if (src.myNode_m->parent_m) {
-			src.myNode_m->parent_m->last_child_m = src.myNode_m->prev_sibling_m;
+			src.myNode_m->parent_m->lastChild_m = src.myNode_m->prevSibling_m;
 		}
 	}
 }
@@ -350,15 +347,15 @@ void Tree<T>::connectToNextSibling(
 	pre_order_iterator &dst, pre_order_iterator &src)
 {
 	src.myNode_m->parent_m = dst.myNode_m->parent_m;
-	if (dst.myNode_m->next_sibling_m) {
-		dst.myNode_m->next_sibling_m->prev_sibling_m = src.myNode_m;
+	if (dst.myNode_m->nextSibling_m) {
+		dst.myNode_m->nextSibling_m->prevSibling_m = src.myNode_m;
 	}
 	else {
-		src.myNode_m->parent_m->last_child_m = src.myNode_m;
+		src.myNode_m->parent_m->lastChild_m = src.myNode_m;
 	}
-	src.myNode_m->next_sibling_m = dst.myNode_m->next_sibling_m;
-	dst.myNode_m->next_sibling_m = src.myNode_m;
-	src.myNode_m->prev_sibling_m = dst.myNode_m;
+	src.myNode_m->nextSibling_m = dst.myNode_m->nextSibling_m;
+	dst.myNode_m->nextSibling_m = src.myNode_m;
+	src.myNode_m->prevSibling_m = dst.myNode_m;
 }
 
 template<typename T>
@@ -366,47 +363,47 @@ void Tree<T>::connectToPrevSibling(
 	pre_order_iterator &dst, pre_order_iterator &src)
 {
 	src.myNode_m->parent_m = dst.myNode_m->parent_m;
-	if (dst.myNode_m->prev_sibling_m != nullptr) {
-		dst.myNode_m->prev_sibling_m->next_sibling_m = src.myNode_m;
+	if (dst.myNode_m->prevSibling_m != nullptr) {
+		dst.myNode_m->prevSibling_m->nextSibling_m = src.myNode_m;
 	}
 	else {
-		dst.myNode_m->parent_m->first_child_m = src.myNode_m;
+		dst.myNode_m->parent_m->firstChild_m = src.myNode_m;
 	}
-	src.myNode_m->prev_sibling_m = dst.myNode_m->prev_sibling_m;
-	src.myNode_m->next_sibling_m = dst.myNode_m;
-	dst.myNode_m->prev_sibling_m = src.myNode_m;
+	src.myNode_m->prevSibling_m = dst.myNode_m->prevSibling_m;
+	src.myNode_m->nextSibling_m = dst.myNode_m;
+	dst.myNode_m->prevSibling_m = src.myNode_m;
 }
 
 template<typename T>
 void Tree<T>::connectToFirstChild(
 	pre_order_iterator &dst, pre_order_iterator &src)
 {
-	if (dst.myNode_m->first_child_m) {
-		dst.myNode_m->first_child_m->prev_sibling_m = src.myNode_m;
+	if (dst.myNode_m->firstChild_m) {
+		dst.myNode_m->firstChild_m->prevSibling_m = src.myNode_m;
 	}
 	else {
-		dst.myNode_m->last_child_m = src.myNode_m;
+		dst.myNode_m->lastChild_m = src.myNode_m;
 	}
 	src.myNode_m->parent_m = dst.myNode_m;
-	src.myNode_m->next_sibling_m = dst.myNode_m->first_child_m;
-	dst.myNode_m->first_child_m = src.myNode_m;
-	src.myNode_m->prev_sibling_m = nullptr;
+	src.myNode_m->nextSibling_m = dst.myNode_m->firstChild_m;
+	dst.myNode_m->firstChild_m = src.myNode_m;
+	src.myNode_m->prevSibling_m = nullptr;
 }
 
 template<typename T>
 void Tree<T>::connectToLastChild(
 	pre_order_iterator &dst, pre_order_iterator &src)
 {
-	if (!dst.myNode_m->first_child_m) {
-		dst.myNode_m->first_child_m = src.myNode_m;
+	if (!dst.myNode_m->firstChild_m) {
+		dst.myNode_m->firstChild_m = src.myNode_m;
 	}
-	if (dst.myNode_m->last_child_m) {
-		dst.myNode_m->last_child_m->next_sibling_m = src.myNode_m;
+	if (dst.myNode_m->lastChild_m) {
+		dst.myNode_m->lastChild_m->nextSibling_m = src.myNode_m;
 	}
 	src.myNode_m->parent_m = dst.myNode_m;
-	src.myNode_m->prev_sibling_m = dst.myNode_m->last_child_m;
-	dst.myNode_m->last_child_m = src.myNode_m;
-	src.myNode_m->next_sibling_m = nullptr;
+	src.myNode_m->prevSibling_m = dst.myNode_m->lastChild_m;
+	dst.myNode_m->lastChild_m = src.myNode_m;
+	src.myNode_m->nextSibling_m = nullptr;
 }
 
 template<typename T>
@@ -415,10 +412,10 @@ inline void Tree<T>::initialize()
 	head_m = new TreeNode<T>();
 	tail_m = new TreeNode<T>();
 
-	head_m->next_sibling_m = tail_m;
-	head_m->prev_sibling_m = head_m;
-	tail_m->prev_sibling_m = head_m;
-	tail_m->next_sibling_m = tail_m;
+	head_m->nextSibling_m = tail_m;
+	head_m->prevSibling_m = head_m;
+	tail_m->prevSibling_m = head_m;
+	tail_m->nextSibling_m = tail_m;
 }
 
 template<typename T>
@@ -436,7 +433,7 @@ void Tree<T>::copy(
 	for (pre_order_iterator itr = begin; itr != end; ++itr) {
 		TreeNode<T>* current = itr.myNode_m;
 		if (current->parent_m != nullptr) {
-			S key = *current->parent_m->key_m;
+			T key = *current->parent_m->key_m;
 			insert_child(find(key), T(*current->key_m));
 		}
 		else {

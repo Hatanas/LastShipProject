@@ -6,10 +6,10 @@ class TreeNode
 {
 public:
 	TreeNode<T>* parent_m;
-	TreeNode<T>* first_child_m;
-	TreeNode<T>* last_child_m;
-	TreeNode<T>* prev_sibling_m;
-	TreeNode<T>* next_sibling_m;
+	TreeNode<T>* firstChild_m;
+	TreeNode<T>* lastChild_m;
+	TreeNode<T>* prevSibling_m;
+	TreeNode<T>* nextSibling_m;
 	T* key_m;
 public:
 	TreeNode();
@@ -21,14 +21,14 @@ public:
 template<typename T>
 inline TreeNode<T>::TreeNode()
 {
-	parent_m = first_child_m = last_child_m = prev_sibling_m = first_child_m = nullptr;
+	parent_m = firstChild_m = lastChild_m = prevSibling_m = firstChild_m = nullptr;
 	key_m = new T();
 }
 
 template<typename T>
 inline TreeNode<T>::TreeNode(const T& key)
 {
-	parent_m = first_child_m = last_child_m = prev_sibling_m = first_child_m = nullptr;
+	parent_m = firstChild_m = lastChild_m = prevSibling_m = firstChild_m = nullptr;
 	key_m = new T(key);
 }
 
