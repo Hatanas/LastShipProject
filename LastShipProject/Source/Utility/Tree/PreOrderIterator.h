@@ -9,8 +9,8 @@ class PreOrderIterator : public BaseTreeIterator<T>
 	PreOrderIterator(){}
 public:
 	explicit PreOrderIterator(TreeNode<T>* node) : BaseTreeIterator<T>(node){}
-	PreOrderIterator &pre_order_increment();
-	PreOrderIterator &pre_order_decrement();
+	PreOrderIterator &postOrderIncrement();
+	PreOrderIterator &preOrderDecrement();
 
 	PreOrderIterator &operator++();
 	PreOrderIterator &operator++(int);
@@ -19,14 +19,15 @@ public:
 };
 
 template<typename T>
-PreOrderIterator<T> &PreOrderIterator<T>::pre_order_increment()
+PreOrderIterator<T> &PreOrderIterator<T>::postOrderIncrement()
 {
-	if (isParent()) {
-		goFirstChild();
-	}
+	if (isNull()){ return *this; }
+
+	if (isParent()) { goFirstChild(); }
 	else {
 		while (isLast()) {
-			if (!goParent()){ break; }
+			if (isRoot()){ break; }
+			else{ goParent(); }
 		}
 		goNextSibling();
 	}
@@ -35,15 +36,18 @@ PreOrderIterator<T> &PreOrderIterator<T>::pre_order_increment()
 }
 
 template<typename T>
-PreOrderIterator<T> &PreOrderIterator<T>::pre_order_decrement()
+PreOrderIterator<T> &PreOrderIterator<T>::preOrderDecrement()
 {
+	if (isNull()){ return *this; }
+	
 	if (isFirst()){
-		goParent();
+		if (isRoot()){ goPrevSibling(); }
+		else{ goParent(); }
 	}
 	else{
 		goPrevSibling();
-		while (!isLeaf()) {
-			if (!goLastChild()){ break; }
+		while (isParent()) {
+			goLastChild();
 		}
 	}
 
@@ -51,7 +55,7 @@ PreOrderIterator<T> &PreOrderIterator<T>::pre_order_decrement()
 }
 
 template<typename T>
-inline PreOrderIterator<T> &PreOrderIterator<T>::operator++(){ return pre_order_increment(); }
+inline PreOrderIterator<T> &PreOrderIterator<T>::operator++(){ return postOrderIncrement(); }
 
 template<typename T>
 inline PreOrderIterator<T> &PreOrderIterator<T>::operator++(int)
@@ -61,7 +65,7 @@ inline PreOrderIterator<T> &PreOrderIterator<T>::operator++(int)
 }
 
 template<typename T>
-inline PreOrderIterator<T> &PreOrderIterator<T>::operator--(){ return pre_order_decrement(); }
+inline PreOrderIterator<T> &PreOrderIterator<T>::operator--(){ return preOrderDecrement(); }
 
 template<typename T>
 inline PreOrderIterator<T> &PreOrderIterator<T>::operator--(int)
@@ -74,53 +78,5 @@ inline PreOrderIterator<T> &PreOrderIterator<T>::operator--(int)
 /*
 template<typename T>
 class PostOrderIterator :
-	public std::iterator<std::bidirectional_iterator_tag, T>,
-	public BaseTreeIterator<T>
-{
-	friend class Tree<T>;
-	PostOrderIterator() : myNode_m(nullptr){}
-public:
-	explicit PostOrderIterator(TreeNode<T>* node) : myNode_m(node){}
-	PostOrderIterator &postorder_increment()
-	{
-		if (isParent()) {
-			goFirstChild();
-		}
-		else {
-			while (isLast()) {
-				if (!goParent()){ break; }
-			}
-			goNextSibling();
-		}
-
-		return *this;
-	}
-	PostOrderIterator &postorder_decrement()
-	{
-		if (isFirstChild()){
-			goParent();
-		}
-		else{
-			goPrevSibling();
-			while (!isLeaf()) {
-				if (!goLastChild()){ break; }
-			}
-		}
-
-		return *this;
-	}
-
-	PostOrderIterator &operator++(){ return postorder_increment(); }
-	PostOrderIterator &operator++(int)
-	{
-		++(*this);
-		return *this;
-	}
-	PostOrderIterator &operator--(){ return postorder_decrement(); }
-	PreOrdPostOrderIteratorerIterator &operator--(int)
-	{
-		--(*this);
-		return *this;
-	}
-};
 */
+
