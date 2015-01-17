@@ -12,14 +12,12 @@ BaseAnimation::~BaseAnimation(){}
 void BaseAnimation::start()
 {
 	isValid_m = true;
-	frame_m = 0.0f;
 	index_m = 0.0f;
 }
 
 void BaseAnimation::stop()
 {
 	isValid_m = false;
-	frame_m = 0.0f;
 	index_m = 0.0f;
 }
 

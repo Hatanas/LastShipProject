@@ -16,7 +16,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	SetBackgroundColor(127, 127, 127);   //”wŒi‚ğ–¾‚é‚­‚·‚é(ŠDF)
 	//--------------------------------‚±‚±‚Ü‚Å‰Šú‰»---------------------------
 
-	DerivedAnimation a(1.0f/60.0f, 10);
+	DerivedAnimation a(1.0f/60.0f, 10.0f);
 	
 	while(ScreenFlip() == 0 && ProcessMessage() == 0 && ClearDrawScreen() == 0) {
 		if(CheckHitKey(KEY_INPUT_ESCAPE) != 0) { break; }
