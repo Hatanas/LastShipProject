@@ -7,7 +7,7 @@
 class BaseDxGame : public GameInterface
 {
 private:
-	bool flgHasFinished = false;
+	bool hasFinished_m = false;
 protected:
 	virtual int initialize() = 0;
 	virtual int finalize() = 0;

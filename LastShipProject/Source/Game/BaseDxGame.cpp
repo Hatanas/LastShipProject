@@ -16,6 +16,6 @@ int BaseDxGame::play()
 	return 0;
 }
 
-void BaseDxGame::finish() { flgHasFinished = true; }
+void BaseDxGame::finish() { hasFinished_m = true; }
 
-bool BaseDxGame::hasFinished() { return flgHasFinished; }
+bool BaseDxGame::hasFinished() { return hasFinished_m; }

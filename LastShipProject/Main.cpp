@@ -1,5 +1,6 @@
 #include "DxLib.h"
 
+#include "Source\Animation\DerivedAnimation.h"
 
 // プログラムは WinMain から始まります
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow)
@@ -15,9 +16,21 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	SetBackgroundColor(127, 127, 127);   //背景を明るくする(灰色)
 	//--------------------------------ここまで初期化---------------------------
 
+	DerivedAnimation a(1.0f/60.0f, 10);
+	
+	while(ScreenFlip() == 0 && ProcessMessage() == 0 && ClearDrawScreen() == 0) {
+		if(CheckHitKey(KEY_INPUT_ESCAPE) != 0) { break; }
+
+		if(CheckHitKey(KEY_INPUT_SPACE)) { a.start(); }
+		if(a.isValid()) {
+			a.update();
+			DrawFormatString(0, 0, 0xffffff, "%f", a.getTime());
+		}
+		if(CheckHitKey(KEY_INPUT_RETURN)) { a.stop(); }
+	}	
 
 	
-
+	
 	//--------------------------------終了処理-------------------------------
 	DxLib_End();// ＤＸライブラリの終了処理
 	
