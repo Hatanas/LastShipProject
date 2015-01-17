@@ -43,12 +43,16 @@ private:
 	Iterator currentScene_m;
 	Factory factory_m;
 
-	SceneManager(const SceneManager &manager);
-	SceneManager &operator=(const SceneManager &manager);
 	int changeScene();
+private:
+	SceneManager(const SceneManager &manager);
+	SceneManager(const SceneManager &&manager);
+	SceneManager &operator=(const SceneManager &manager);
+	SceneManager &operator=(const SceneManager &&manager);
 public:
 	SceneManager() : currentScene_m(tree_m.end()){}
 	~SceneManager(){}
+public:
 	template<typename DerivedScene>
 	int registerScene(SceneID id);
 	int executeScene();
