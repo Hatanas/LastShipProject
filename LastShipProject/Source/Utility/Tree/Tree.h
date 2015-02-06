@@ -17,39 +17,42 @@ public:
 	};
 	typedef PreOrderIterator<T> pre_order_iterator;
 private:
+	typedef pre_order_iterator iterator;
+private:
 	TreeNode<T> *head_m;
 	TreeNode<T> *tail_m;
 	std::map<T, TreeNode<T> *> nodeMap_m;
 public:
 	Tree();
-	Tree(const Tree& t);
+	Tree(Tree const &t);
 	~Tree();
-	Tree& operator=(const Tree& t);
+	Tree<T>& operator=(Tree<T> const &t);
+public:
 	void clear();
 	bool empty() const;
 	size_t size() const;
 	size_t height() const;
-	pre_order_iterator begin() const;
-	pre_order_iterator rbegin() const;
-	pre_order_iterator end() const;
-	pre_order_iterator rend() const;
-	pre_order_iterator insert_root(const T &key);
-	pre_order_iterator insert_parent(pre_order_iterator child, const T &key);
-	pre_order_iterator insert_sibling(pre_order_iterator sibling, const T &key);
-	pre_order_iterator insert_child(pre_order_iterator parent, const T& key);
-	pre_order_iterator find(const T& key);
-	void erase(pre_order_iterator pos);
-	pre_order_iterator move(
-		pre_order_iterator dst, pre_order_iterator src, MoveDirection dir);
+	iterator begin() const;
+	iterator rbegin() const;
+	iterator end() const;
+	iterator rend() const;
+	iterator insert_root(T const &key);
+	iterator insert_parent(iterator child, T const &key);
+	iterator insert_sibling(iterator sibling, T const &key);
+	iterator insert_child(iterator parent, T const &key);
+	iterator find(T const &key);
+	void erase(iterator pos);
+	iterator move(
+		iterator dst, iterator src, MoveDirection dir);
 protected:
-	void disconect(pre_order_iterator &src);
-	void connectToNextSibling(pre_order_iterator &dst, pre_order_iterator &src);
-	void connectToPrevSibling(pre_order_iterator &dst, pre_order_iterator &src);
-	void connectToFirstChild(pre_order_iterator &dst, pre_order_iterator &src);
-	void connectToLastChild(pre_order_iterator &dst, pre_order_iterator &src);
+	void disconect(iterator &src);
+	void connectToNextSibling(iterator &dst, iterator &src);
+	void connectToPrevSibling(iterator &dst, iterator &src);
+	void connectToFirstChild(iterator &dst, iterator &src);
+	void connectToLastChild(iterator &dst, iterator &src);
 	void initialize();
 	void finalize();
-	void copy(pre_order_iterator &begin, pre_order_iterator &end);
+	void copy(iterator const &begin, iterator const &end);
 };
 
 
@@ -60,7 +63,7 @@ inline Tree<T>::Tree()
 }
 
 template<typename T>
-inline Tree<T>::Tree(const Tree& t)
+inline Tree<T>::Tree(Tree const &t)
 {
 	initialize();
 	copy(t.begin(), t.end());
@@ -73,7 +76,7 @@ inline Tree<T>::~Tree()
 }
 
 template<typename T>
-inline Tree<T>& Tree<T>::operator=(const Tree<T>& t)
+inline Tree<T>& Tree<T>::operator=(Tree<T> const &t)
 {
 	if (this != &t) {
 		this->~Tree();
@@ -86,18 +89,18 @@ template<typename T>
 void Tree<T>::clear()
 {
 	if (head_m->nextSibling_m != tail_m) {
-		TreeNode<T>* current = head_m->nextSibling_m;
-		TreeNode<T>* next;
+		TreeNode<T> *current = head_m->nextSibling_m;
+		TreeNode<T> *next;
 		do {
 			next = current->nextSibling_m;
-			erase(pre_order_iterator(current));
+			erase(iterator(current));
 			current = next;
 		} while (next != tail_m);
 	}
 }
 
 template<typename T>
-inline bool Tree<T>::empty() const { return head_m->nextSibling_m == tail_m; }
+inline bool Tree<T>::empty() const{ return nodeMap_m.empty(); }
 
 template<typename T>
 inline size_t Tree<T>::size() const { return nodeMap_m.size(); }
@@ -107,9 +110,9 @@ size_t Tree<T>::height() const
 {
 	size_t height = 0;
 	
-	for (pre_order_iterator iterator = begin(); iterator != end(); ++iterator){
-		if (iterator.isLeaf() && iterator.depth() > height){
-			height = iterator.depth();
+	for (iterator itr = begin(); itr != end(); ++itr){
+		if (itr.isLeaf() && itr.depth() > height){
+			height = itr.depth();
 		}
 	}
 	return height;
@@ -118,34 +121,28 @@ size_t Tree<T>::height() const
 template<typename T>
 inline typename PreOrderIterator<T> Tree<T>::begin() const
 {
-	return pre_order_iterator(head_m->nextSibling_m);
+	return iterator(head_m->nextSibling_m);
 }
 
 template<typename T>
 inline PreOrderIterator<T> Tree<T>::rbegin() const { return --end(); }
 
 template<typename T>
-inline PreOrderIterator<T> Tree<T>::end() const
-{
-	return pre_order_iterator(tail_m);
-}
+inline PreOrderIterator<T> Tree<T>::end() const{ return iterator(tail_m); }
 
 template<typename T>
-inline PreOrderIterator<T> Tree<T>::rend() const
-{
-	return pre_order_iterator(head_m);
-}
+inline PreOrderIterator<T> Tree<T>::rend() const{ return iterator(head_m); }
 
 template<typename T>
-inline PreOrderIterator<T> Tree<T>::insert_root(const T &key)
+inline PreOrderIterator<T> Tree<T>::insert_root(T const &key)
 {
 	clear();
-	return insert_sibling(pre_order_iterator(head_m), key);
+	return insert_sibling(iterator(head_m), key);
 }
 
 template<typename T>
 PreOrderIterator<T> Tree<T>::insert_parent(
-	pre_order_iterator child, const T &key)
+	iterator child, T const &key)
 {
 	if (find(key) != end()){ return end(); }
 	if (empty()) {
@@ -180,16 +177,16 @@ PreOrderIterator<T> Tree<T>::insert_parent(
 	child.myNode_m->prevSibling_m = nullptr;
 	child.myNode_m->parent_m = newNode;
 
-	return pre_order_iterator(newNode);
+	return iterator(newNode);
 }
 
 template<typename T>
 PreOrderIterator<T> Tree<T>::insert_sibling(
-	pre_order_iterator sibling, const T &key)
+	iterator sibling, T const &key)
 {
 	if (find(key) != end()){ return end(); }
 	if (empty()) {
-		sibling = pre_order_iterator(head_m);
+		sibling = iterator(head_m);
 	}
 	else if (sibling.myNode_m->parent_m == nullptr){ return end(); }
 
@@ -208,12 +205,12 @@ PreOrderIterator<T> Tree<T>::insert_sibling(
 	}
 	sibling.myNode_m->nextSibling_m = newNode;
 
-	return pre_order_iterator(newNode);
+	return iterator(newNode);
 }
 
 template<typename T>
 PreOrderIterator<T> Tree<T>::insert_child(
-	pre_order_iterator parent, const T& key)
+	iterator parent, const T& key)
 {
 	if (find(key) != end()){ return end(); }
 	if (empty()) {
@@ -233,15 +230,16 @@ PreOrderIterator<T> Tree<T>::insert_child(
 	}
 	parent.myNode_m->lastChild_m = newNode;
 
-	return pre_order_iterator(newNode);
+	return iterator(newNode);
 }
 
 template<typename T>
-inline PreOrderIterator<T> Tree<T>::find(const T& key)
+inline PreOrderIterator<T> Tree<T>::find(T const &key)
 {
-	typename std::map<T, TreeNode<T>*>::iterator itr = nodeMap_m.find(key);
+	typename std::map<T, TreeNode<T>*>::iterator itr
+		= nodeMap_m.find(key);
 	if (itr != nodeMap_m.end()) {
-		return pre_order_iterator(itr->second);
+		return iterator(itr->second);
 	}
 	else{
 		return end();
@@ -249,14 +247,14 @@ inline PreOrderIterator<T> Tree<T>::find(const T& key)
 }
 
 template<typename T>
-void Tree<T>::erase(pre_order_iterator pos)
+void Tree<T>::erase(iterator pos)
 {
 	if (pos.myNode_m == head_m) { return; }
 	if (pos.myNode_m == tail_m) { return; }
 
 	// erase subtree of pos
-	while (pos.myNode_m->firstChild_m) {
-		erase(pre_order_iterator(pos.myNode_m->firstChild_m));
+	 while (pos.myNode_m->firstChild_m) {
+		erase(iterator(pos.myNode_m->firstChild_m));
 	}
 
 	TreeNode<T>* deleteNode = pos.myNode_m;
@@ -287,11 +285,11 @@ void Tree<T>::erase(pre_order_iterator pos)
 
 template<typename T>
 PreOrderIterator<T> Tree<T>::move(
-	pre_order_iterator dst, pre_order_iterator src, MoveDirection dir)
+	iterator dst, iterator src, MoveDirection dir)
 {
 	if (dst == src) { return end(); }
 	if (dst == end() || src == end()){ return end(); }
-	pre_order_iterator tmp = dst;
+	iterator tmp = dst;
 	while (tmp.myNode_m->parent_m != nullptr){
 		tmp.myNode_m = tmp.myNode_m->parent_m;
 		if (tmp == src){ return end(); }
@@ -323,7 +321,7 @@ PreOrderIterator<T> Tree<T>::move(
 }
 
 template<typename T>
-void Tree<T>::disconect(pre_order_iterator &src){
+void Tree<T>::disconect(iterator &src){
 	if (src.myNode_m->prevSibling_m) {
 		src.myNode_m->prevSibling_m->nextSibling_m = src.myNode_m->nextSibling_m;
 	}
@@ -343,8 +341,7 @@ void Tree<T>::disconect(pre_order_iterator &src){
 }
 
 template<typename T>
-void Tree<T>::connectToNextSibling(
-	pre_order_iterator &dst, pre_order_iterator &src)
+void Tree<T>::connectToNextSibling(iterator &dst, iterator &src)
 {
 	src.myNode_m->parent_m = dst.myNode_m->parent_m;
 	if (dst.myNode_m->nextSibling_m) {
@@ -359,8 +356,7 @@ void Tree<T>::connectToNextSibling(
 }
 
 template<typename T>
-void Tree<T>::connectToPrevSibling(
-	pre_order_iterator &dst, pre_order_iterator &src)
+void Tree<T>::connectToPrevSibling(iterator &dst, iterator &src)
 {
 	src.myNode_m->parent_m = dst.myNode_m->parent_m;
 	if (dst.myNode_m->prevSibling_m != nullptr) {
@@ -375,8 +371,7 @@ void Tree<T>::connectToPrevSibling(
 }
 
 template<typename T>
-void Tree<T>::connectToFirstChild(
-	pre_order_iterator &dst, pre_order_iterator &src)
+void Tree<T>::connectToFirstChild(iterator &dst, iterator &src)
 {
 	if (dst.myNode_m->firstChild_m) {
 		dst.myNode_m->firstChild_m->prevSibling_m = src.myNode_m;
@@ -391,8 +386,7 @@ void Tree<T>::connectToFirstChild(
 }
 
 template<typename T>
-void Tree<T>::connectToLastChild(
-	pre_order_iterator &dst, pre_order_iterator &src)
+void Tree<T>::connectToLastChild(iterator &dst, iterator &src)
 {
 	if (!dst.myNode_m->firstChild_m) {
 		dst.myNode_m->firstChild_m = src.myNode_m;
@@ -427,10 +421,9 @@ inline void Tree<T>::finalize()
 }
 
 template<typename T>
-void Tree<T>::copy(
-	pre_order_iterator &begin, pre_order_iterator &end)
+void Tree<T>::copy(iterator const &begin, iterator const &end)
 {
-	for (pre_order_iterator itr = begin; itr != end; ++itr) {
+	for(iterator itr = begin; itr != end; ++itr) {
 		TreeNode<T>* current = itr.myNode_m;
 		if (current->parent_m != nullptr) {
 			T key = *current->parent_m->key_m;
@@ -441,3 +434,4 @@ void Tree<T>::copy(
 		}
 	}
 }
+

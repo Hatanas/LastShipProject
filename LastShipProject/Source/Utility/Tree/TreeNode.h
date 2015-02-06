@@ -1,6 +1,5 @@
 #pragma once
 
-
 template<typename T>
 class TreeNode
 {
@@ -21,14 +20,14 @@ public:
 template<typename T>
 inline TreeNode<T>::TreeNode()
 {
-	parent_m = firstChild_m = lastChild_m = prevSibling_m = firstChild_m = nullptr;
+	parent_m = firstChild_m = lastChild_m = prevSibling_m = nextSibling_m = nullptr;
 	key_m = new T();
 }
 
 template<typename T>
-inline TreeNode<T>::TreeNode(const T& key)
+inline TreeNode<T>::TreeNode(T const &key)
 {
-	parent_m = firstChild_m = lastChild_m = prevSibling_m = firstChild_m = nullptr;
+	parent_m = firstChild_m = lastChild_m = prevSibling_m = nextSibling_m = nullptr;
 	key_m = new T(key);
 }
 
@@ -36,5 +35,6 @@ template<typename T>
 inline TreeNode<T>::~TreeNode()
 {
 	delete key_m;
+	key_m = nullptr;
 }
 
