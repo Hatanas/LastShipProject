@@ -10,6 +10,8 @@
 //                   : addGeneratorで追加したシーン生成クラスはclearMapでdeleteされます。
 //---------------------------------------------------------------------------------------
 
+namespace projectj {
+namespace scenemanager {
 
 template<typename SceneID>
 class SceneIDGeneratorMap
@@ -23,18 +25,16 @@ private:
 	SceneIDGeneratorMap(const SceneIDGeneratorMap &generator);
 	SceneIDGeneratorMap &operator=(const SceneIDGeneratorMap &generator);
 public:
-	SceneIDGeneratorMap(){}
-	~SceneIDGeneratorMap(){}
+	SceneIDGeneratorMap() {}
+	~SceneIDGeneratorMap() {}
 	template<class Scene>
 	int insertGenerator(SceneID id);
 	int insertGenerator(SceneID id, Generator *generator);
 	void clearMap();
-	Generator *getGenerator(SceneID &id);
+	Generator *getGenerator(SceneID &id) const;
 };
 
-
-template<typename SceneID>
-template<class Scene>
+template<typename SceneID> template<class Scene>
 int SceneIDGeneratorMap<SceneID>::insertGenerator(SceneID id)
 {
 	return insertGenerator(id, new SceneGenerator<SceneID, Scene>());
@@ -44,10 +44,10 @@ template<typename SceneID>
 int SceneIDGeneratorMap<SceneID>::insertGenerator(
 	SceneID id, Generator *generator)
 {
-	if (generator == nullptr){ return -1; }
-	if (map_m.find(id) != map_m.end()){ return -1; }
-
-	map_m[id] = generator;
+	if(generator == nullptr) { return -1; }
+	if(map_m.find(id) != map_m.end()) { return -1; }
+	map_m.insert(std::make_pair(id, generator));
+	//map_m.[id] = generator;
 
 	return 0;
 }
@@ -65,55 +65,12 @@ void SceneIDGeneratorMap<SceneID>::clearMap()
 
 template<typename SceneID>
 typename SceneIDGeneratorMap<SceneID>::Generator *
-	SceneIDGeneratorMap<SceneID>::getGenerator(SceneID &id)
+	SceneIDGeneratorMap<SceneID>::getGenerator(SceneID &id) const
 {
-	if (map_m.find(id) == map_m.end()){ return nullptr; }
-	
+	if(map_m.find(id) == map_m.end()) { return nullptr; }
+
 	return map_m.at(id);
 }
 
-
-/*
-template<class Scene>
-int SceneIDGeneratorMap::insertGenerator(SceneID id)
-{
-	return insertGenerator(id, new SceneGenerator<SceneID, Scene>());
 }
-
-template<>
-int SceneIDGeneratorMap::insertGenerator<nullptr_t>(SceneID id);
-
-int SceneIDGeneratorMap::insertGenerator(SceneID id, BaseSceneGenerator *generator)
-{
-	if (generator == nullptr){ return -1; }
-	if (map_m.find(id) != map_m.end()){ return -1; }
-	
-	map_m[id] = generator;
-	
-	return 0;
 }
-
-
-void SceneIDGeneratorMap::clearMap()
-{
-	std::for_each(map_m.begin(), map_m.end(), [](PairIDGenerator pair)
-	{
-		delete pair.second;
-		pair.second = nullptr;
-	});
-	map_m.clear();
-}
-
-
-
-BaseSceneGenerator *SceneIDGeneratorMap::getGenerator(SceneID &id)
-{
-	BaseSceneGenerator *generator = nullptr;
-
-	if (map_m.find(id) != map_m.end()){
-		generator = map_m[id];
-	}
-	
-	return generator;
-}
-*/

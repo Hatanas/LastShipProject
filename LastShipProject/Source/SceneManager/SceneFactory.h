@@ -6,30 +6,33 @@
 //機能, 役割         : シーンの生成をします。
 //---------------------------------------------------------------------------------------
 
+namespace projectj {
+namespace scenemanager {
+
 template<typename SceneID>
 class SceneFactory
 {
 private:
 	typedef BaseScene<SceneID> Scene;
 	typedef BaseSceneGenerator<SceneID> Generator;
+	typedef typename Generator::SharedScene SharedScene;
 	typedef SceneIDGeneratorMap<SceneID> IDGeneratorMap;
 
 	IDGeneratorMap idGeneratorMap_m;
-
+private:
 	SceneFactory(const SceneFactory &factory);
 	SceneFactory &operator=(const SceneFactory &factory);
 public:
-	SceneFactory(){}
-	~SceneFactory(){}
-	Scene *getScene(SceneID id);
+	SceneFactory() {}
+	~SceneFactory() {}
+public:
+	SharedScene getScene(SceneID id) const;
 	void finalize();
 	template<class DerivedScene>
 	int insertGenerator(SceneID id);
 };
 
-
-template<typename SceneID>
-template<class DerivedScene>
+template<typename SceneID> template<class DerivedScene>
 int SceneFactory<SceneID>::insertGenerator(SceneID id)
 {
 	return idGeneratorMap_m.insertGenerator<DerivedScene>(id);
@@ -42,15 +45,18 @@ void SceneFactory<SceneID>::finalize()
 }
 
 template<typename SceneID>
-typename SceneFactory<SceneID>::Scene *SceneFactory<SceneID>::getScene(SceneID id)
+typename SceneFactory<SceneID>::SharedScene SceneFactory<SceneID>::getScene(SceneID id) const
 {
 	Generator *generator = nullptr;
-	Scene *newScene = nullptr;
+	SharedScene newScene = nullptr;
 
 	generator = idGeneratorMap_m.getGenerator(id);
-	if (generator != nullptr){
+	if(generator != nullptr) {
 		newScene = generator->generateScene();
 	}
-	
+
 	return newScene;
+}
+
+}
 }
