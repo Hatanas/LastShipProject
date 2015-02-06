@@ -1,7 +1,6 @@
 #include "DxLib.h"
 
 #include "Source\Animation\DerivedAnimation.h"
-
 // プログラムは WinMain から始まります
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow)
 {
@@ -15,6 +14,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	SetWriteZBuffer3D(TRUE);             //z軸(奥行)を正しく描画
 	SetBackgroundColor(127, 127, 127);   //背景を明るくする(灰色)
 	//--------------------------------ここまで初期化---------------------------
+
 
 	DerivedAnimation a(1.0f/60.0f, 10.0f);
 	
