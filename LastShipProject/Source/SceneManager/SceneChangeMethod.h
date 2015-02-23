@@ -1,9 +1,6 @@
 #pragma once
 
-#include "SceneFactory.h"
-#include "SceneTree.h"
-#include "BaseScene.h"
-#include <memory>
+#include "BaseSceneChangeMethod.h"
 
 namespace projectj {
 namespace scenemanager {
@@ -13,72 +10,83 @@ class BaseScene;
 template<typename SceneID>
 class SceneTree;
 template<typename SceneID>
+class SceneNode;
+template<typename SceneID>
 class SceneFactory;
 
-template<typename SceneID>
-class BaseSceneChangeMethod
-{
-protected:
-	typedef BaseScene<SceneID> Scene;
-	typedef SceneFactory<SceneID> Factory;
-	typedef SceneTree<SceneID> Tree;
-	typedef typename Tree::SharedScene SharedScene;
-	typedef typename Tree::Iterator Iterator;
+}
+}
 
-	SceneID nextID_m;
-public:
-	BaseSceneChangeMethod(SceneID const &id) :nextID_m(id) {}
-public:
-	virtual Iterator changeScene(
-		Factory const &factory, Tree &tree, Iterator const &current) const
-	{
-		return tree.end();
-	}
-};
+namespace projectj {
+namespace scenemanager {
 
 template<typename SceneID>
-class KeepScene : public BaseSceneChangeMethod < SceneID >
+class KeepScene : public BaseSceneChangeMethod<SceneID>
 {
+private:
+	typedef SceneID ID_t;
+	typedef BaseSceneChangeMethod<SceneID> Base_t;
+	typedef typename Tree<SceneNode<SceneID>>::preorder_iterator Iterator_t;
+	typedef SceneFactory<SceneID> Factory_t;
+	typedef SceneTree<SceneID> Tree_t;
+	typedef SceneNode<SceneID> Node_t;
+	typedef std::shared_ptr<BaseScene<SceneID>> SharedScene_t;
 public:
-	KeepScene(SceneID const &id)
-		:BaseSceneChangeMethod<SceneID>(id) {}
+	KeepScene(ID_t const &id) :Base_t(id) {}
 public:
-	virtual Iterator changeScene(
-		Factory const &factory, Tree &tree, Iterator const &current) const
+	Iterator_t changeScene(
+		Factory_t const &factory, Tree_t &tree, Iterator_t &current) const
 	{
 		return current;
 	}
 };
 
+
 template<typename SceneID>
-class ClearScene : public BaseSceneChangeMethod < SceneID >
+class ClearScene : public BaseSceneChangeMethod<SceneID>
 {
+private:
+	typedef SceneID ID_t;
+	typedef BaseSceneChangeMethod<SceneID> Base_t;
+	typedef typename Tree<SceneNode<SceneID>>::preorder_iterator Iterator_t;
+	typedef SceneFactory<SceneID> Factory_t;
+	typedef SceneTree<SceneID> Tree_t;
+	typedef SceneNode<SceneID> Node_t;
+	typedef std::shared_ptr<BaseScene<SceneID>> SharedScene_t;
 public:
-	ClearScene(SceneID const &id)
-		:BaseSceneChangeMethod<SceneID>(id) {}
+	ClearScene(SceneID const &id) :Base_t(id)
+	{}
 public:
-	Iterator changeScene(
-		Factory const &factory, Tree &tree, Iterator const &current) const
+	Iterator_t changeScene(
+		Factory_t const &factory, Tree_t &tree, Iterator_t &current) const
 	{
 		tree.clear();
 		return tree.end();
 	}
 };
 
+
 template<typename SceneID>
-class PopScene : public BaseSceneChangeMethod < SceneID >
+class PopScene : public BaseSceneChangeMethod<SceneID>
 {
+private:
+	typedef SceneID ID_t;
+	typedef BaseSceneChangeMethod<SceneID> Base_t;
+	typedef typename Tree<SceneNode<SceneID>>::preorder_iterator Iterator_t;
+	typedef SceneFactory<SceneID> Factory_t;
+	typedef SceneTree<SceneID> Tree_t;
+	typedef SceneNode<SceneID> Node_t;
+	typedef std::shared_ptr<BaseScene<SceneID>> SharedScene_t;
 public:
-	PopScene(SceneID const &id)
-		:BaseSceneChangeMethod<SceneID>(id) {}
+	PopScene(SceneID const &id) :Base_t(id) {}
 public:
-	Iterator changeScene(
-		Factory const &factory, Tree &tree, Iterator const &current) const
+	Iterator_t changeScene(
+		Factory_t const &factory, Tree_t &tree, Iterator_t &current) const
 	{
 		if(current == tree.end()) { return tree.end(); }
 		if(current.isRoot()) { return tree.end(); }
 
-		Iterator target = current, parent = current;
+		auto target = current, parent = current;
 
 		parent.goParent();
 		tree.erase(target);
@@ -87,39 +95,56 @@ public:
 	}
 };
 
+
 template<typename SceneID>
-class ResetScene : public BaseSceneChangeMethod < SceneID >
+class ResetScene : public BaseSceneChangeMethod<SceneID>
 {
+private:
+	typedef SceneID ID_t;
+	typedef BaseSceneChangeMethod<SceneID> Base_t;
+	typedef typename Tree<SceneNode<SceneID>>::preorder_iterator Iterator_t;
+	typedef SceneFactory<SceneID> Factory_t;
+	typedef SceneTree<SceneID> Tree_t;
+	typedef SceneNode<SceneID> Node_t;
+	typedef std::shared_ptr<BaseScene<SceneID>> SharedScene_t;
 public:
-	ResetScene(SceneID const &id)
-		:BaseSceneChangeMethod<SceneID>(id) {}
+	ResetScene(SceneID const &id) :Base_t(id) {}
 public:
-	Iterator changeScene(
-		Factory const &factory, Tree &tree, Iterator const &current) const
+	Iterator_t changeScene(
+		Factory_t const &factory, Tree_t &tree, Iterator_t &current) const
 	{
-		SharedScene scene = factory.getScene(nextID_m);
+		SharedScene_t scene = factory.getScene(nextID_m);
+
 		tree.clear();
+
 		if(scene == nullptr) { return tree.end(); }
 		scene->initialize();
-
-		return tree.insertRoot({ nextID_m, scene });
+		return tree.setRoot({ nextID_m, scene });
 	}
 };
 
+
 template<typename SceneID>
-class PushScene : public BaseSceneChangeMethod < SceneID >
+class PushScene : public BaseSceneChangeMethod<SceneID>
 {
+private:
+	typedef SceneID ID_t;
+	typedef BaseSceneChangeMethod<SceneID> Base_t;
+	typedef typename Tree<SceneNode<SceneID>>::preorder_iterator Iterator_t;
+	typedef SceneFactory<SceneID> Factory_t;
+	typedef SceneTree<SceneID> Tree_t;
+	typedef SceneNode<SceneID> Node_t;
+	typedef std::shared_ptr<BaseScene<SceneID>> SharedScene_t;
 public:
-	PushScene(SceneID const &id)
-		:BaseSceneChangeMethod<SceneID>(id) {}
+	PushScene(SceneID const &id) :Base_t(id) {}
 public:
-	Iterator changeScene(
-		Factory const &factory, Tree &tree, Iterator const &current) const
+	Iterator_t changeScene(
+		Factory_t const &factory, Tree_t &tree, Iterator_t &current) const
 	{
-		SharedScene scene = factory.getScene(nextID_m);
+		SharedScene_t scene = factory.getScene(nextID_m);
 		if(scene == nullptr) { return tree.end(); }
 
-		Iterator child = tree.insertChild(current, { nextID_m, scene });
+		Iterator_t child = tree.insertChild(current, { nextID_m, scene });
 		if(child == tree.end()) { return tree.end(); }
 
 		scene->initialize();
@@ -128,20 +153,28 @@ public:
 	}
 };
 
+
 template<typename SceneID>
-class JumpScene : public BaseSceneChangeMethod < SceneID >
+class JumpScene : public BaseSceneChangeMethod<SceneID>
 {
+private:
+	typedef SceneID ID_t;
+	typedef BaseSceneChangeMethod<SceneID> Base_t;
+	typedef typename Tree<SceneNode<SceneID>>::preorder_iterator Iterator_t;
+	typedef SceneFactory<SceneID> Factory_t;
+	typedef SceneTree<SceneID> Tree_t;
+	typedef SceneNode<SceneID> Node_t;
+	typedef std::shared_ptr<BaseScene<SceneID>> SharedScene_t;
 public:
-	JumpScene(SceneID const &id)
-		:BaseSceneChangeMethod<SceneID>(id) {}
+	JumpScene(SceneID const &id) :Base_t(id) {}
 public:
-	Iterator changeScene(
-		Factory const &factory, Tree &tree, Iterator const &current) const
+	Iterator_t changeScene(
+		Factory_t const &factory, Tree_t &tree, Iterator_t &current) const
 	{
-		Iterator iterator = tree.find(nextID_m);
+		Iterator_t iterator = tree.find(nextID_m);
 
 		if(iterator == tree.end()) {
-			iterator = PushScene<SceneID>(nextID_m).changeScene(
+			iterator = PushScene<ID_t>(nextID_m).changeScene(
 				factory, tree, current);
 		}
 
@@ -149,37 +182,53 @@ public:
 	}
 };
 
+
 template<typename SceneID>
-class ParentScene : public BaseSceneChangeMethod < SceneID >
+class ParentScene : public BaseSceneChangeMethod<SceneID>
 {
+private:
+	typedef SceneID ID_t;
+	typedef BaseSceneChangeMethod<SceneID> Base_t;
+	typedef typename Tree<SceneNode<SceneID>>::preorder_iterator Iterator_t;
+	typedef SceneFactory<SceneID> Factory_t;
+	typedef SceneTree<SceneID> Tree_t;
+	typedef SceneNode<SceneID> Node_t;
+	typedef std::shared_ptr<BaseScene<SceneID>> SharedScene_t;
 public:
-	ParentScene(SceneID const &id)
-		:BaseSceneChangeMethod<SceneID>(id) {}
+	ParentScene(SceneID const &id) :Base_t(id) {}
 public:
-	Iterator changeScene(
-		Factory const &factory, Tree &tree, Iterator const &current) const
+	Iterator_t changeScene(
+		Factory_t const &factory, Tree_t &tree, Iterator_t &current) const
 	{
 		if(current.isRoot() || current == tree.end()) { return tree.end(); }
-		Iterator parent = current;
+		Iterator_t parent = current;
 		parent.goParent();
 
 		return parent;
 	}
 };
 
+
 template<typename SceneID>
-class ChildScene : public BaseSceneChangeMethod < SceneID >
+class ChildScene : public BaseSceneChangeMethod<SceneID>
 {
+private:
+	typedef SceneID ID_t;
+	typedef BaseSceneChangeMethod<SceneID> Base_t;
+	typedef typename Tree<SceneNode<SceneID>>::preorder_iterator Iterator_t;
+	typedef SceneFactory<SceneID> Factory_t;
+	typedef SceneTree<SceneID> Tree_t;
+	typedef SceneNode<SceneID> Node_t;
+	typedef std::shared_ptr<BaseScene<SceneID>> SharedScene_t;
 public:
-	ChildScene(SceneID const &id)
-		:BaseSceneChangeMethod<SceneID>(id) {}
+	ChildScene(SceneID const &id) :Base_t(id) {}
 public:
-	Iterator changeScene(
-		Factory const &factory, Tree &tree, Iterator const &current) const
+	Iterator_t changeScene(
+		Factory_t const &factory, Tree_t &tree, Iterator_t &current) const
 	{
 		if(current.isLeaf()) { return tree.end(); }
 
-		Iterator firstChild = current;
+		Iterator_t firstChild = current;
 		firstChild.goFirstChild();
 
 		while(true) {
@@ -191,20 +240,6 @@ public:
 		}
 
 		return firstChild;
-	}
-};
-
-
-template<typename SceneID>
-class SceneChangeMethodFactory
-{
-public:
-	typedef std::unique_ptr<BaseSceneChangeMethod<SceneID>> SceneChangeMethod;
-
-	template<class Changer>
-	static SceneChangeMethod get(SceneID const&nextID)
-	{
-		return std::make_unique<Changer>(nextID);
 	}
 };
 
