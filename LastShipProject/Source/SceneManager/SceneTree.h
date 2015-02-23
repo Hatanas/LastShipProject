@@ -2,9 +2,8 @@
 
 #include <memory>
 #include <algorithm>
-#include "../Utility/Tree/Tree.h"
+#include "../Tree/Tree.h"
 #include "BaseScene.h"
-
 namespace projectj {
 namespace scenemanager {
 

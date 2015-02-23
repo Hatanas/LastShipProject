@@ -23,7 +23,7 @@ namespace scenemanager {
 template<typename SceneID>
 class BaseSceneChangeMethod
 {
-private:
+protected:
 	typedef SceneID ID_t;
 	typedef BaseSceneChangeMethod<SceneID> Base_t;
 	typedef typename Tree<SceneNode<SceneID>>::preorder_iterator Iterator_t;
@@ -34,10 +34,12 @@ private:
 protected:
 	ID_t nextID_m;
 public:
-	BaseSceneChangeMethod(ID_t const &id) :nextID_m(id) {}
+	BaseSceneChangeMethod(ID_t const &id) :nextID_m(id){}
+	BaseSceneChangeMethod() = default;
+	virtual ~BaseSceneChangeMethod() = default;
 public:
-	Iterator_t changeScene(
-		Factory_t const &factory, Tree_t &tree, Iterator_t &current) const
+	virtual Iterator_t changeScene(
+		Factory_t const &factory, Tree_t &tree, Iterator_t current) const
 	{
 		return tree.end();
 	}

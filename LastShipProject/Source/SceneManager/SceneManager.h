@@ -86,7 +86,7 @@ public:
 	{
 		if(currentScene_m == tree_m.end()) { return -1; }
 		if(currentScene_m->scene_m == nullptr) { return -1; }
-		if(currentScene_m->scene_m->execute() != 0) { return -1; }
+		if(currentScene_m->scene_m->doOneFrame() != 0) { return -1; }
 		if(changeScene() != 0) { return -1; }
 
 		return 0;
